@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Créditos</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>📊 Registro de Créditos</h1>
+
+    <table id="tabla-creditos">
+      <thead>
+        <tr>
+          <th>N° Crédito</th>
+          <th>Marca temporal</th>
+          <th>Fecha de crédito</th>
+          <th>Cliente</th>
+          <th>Monto prestado</th>
+          <th>Modalidad</th>
+          <th>Estado</th>
+           <th>⚠️</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+  <!-- MODAL -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <span id="cerrar">&times;</span>
+      <div id="detalle"></div>
+    </div>
+  </div>
+
+  <!-- LIBRERÍAS -->
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
+
+  <!-- TU APP -->
+  <script src="app.js"></script>
+
+</body>
+</html>

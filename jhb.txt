@@ -1,0 +1,129 @@
+const csvUrl =
+  "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpu_9c9fZqHswzB37oEUUoFDVNQiykgy-Z-6ZQhAN0VfRhQdbuXSflvhhmh7VLHxA0dnWZ6u62epnX/pub?gid=830648104&single=true&output=csv";
+
+const urlSinCache = csvUrl + "&ts=" + new Date().getTime();
+
+Papa.parse(urlSinCache, {
+  download: true,
+  header: true,
+  skipEmptyLines: true,
+  complete: function (results) {
+    const data = results.data;
+    const tbody = document.querySelector("#tabla-creditos tbody");
+    tbody.innerHTML = "";
+
+    data.forEach((row) => {
+      if (!row["Num de Credito"]) return;
+
+      let claseEstado = "";
+      if (row["Estado"] === "Activo") claseEstado = "estado-activo";
+      if (row["Estado"] === "Cancelado") claseEstado = "estado-cancelado";
+
+      const tr = document.createElement("tr");
+
+      tr.innerHTML = `
+        <td>${row["Num de Credito"]}</td>
+        <td>${row["Marca temporal"]}</td>
+        <td>${row["Fecha de Credito "]}</td>
+        <td>${row["Nombre del Cliente"]}</td>
+        <td>$${row["Monto prestado"]}</td>
+        <td>${row["Modalidad de Pago "]}</td>
+        <td class="${claseEstado}">${row["Estado"]}</td>
+      `;
+
+      tbody.appendChild(tr);
+    });
+  },
+});
+..-----------
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #2c3e50;
+  color: white;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+  background: #f1f1f1;
+}
+
+.estado-activo {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.estado-cancelado {
+  color: #e74c3c;
+  font-weight: bold;
+}
+----------
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Registro de Créditos</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <div class="container">
+    <h1>📊 Registro de Créditos</h1>
+
+    <table id="tabla-creditos">
+      <thead>
+        <tr>
+          <th>N° Crédito</th>
+          <th>Marca temporal</th>
+          <th>Fecha de crédito</th>
+          <th>Cliente</th>
+          <th>Monto prestado</th>
+          <th>Modalidad</th>
+          <th>Estado</th>
+        </tr>
+      </thead>
+      <tbody>
+        <!-- Datos automáticos -->
+      </tbody>
+    </table>
+    
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+  <script src="app.js"></script>
+
+</body>
+</html>
