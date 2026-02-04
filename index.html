@@ -2,15 +2,24 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Registro de Créditos</title>
+  <title>Registro de Créditos - Login</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <div class="container">
-    <h1>📊 Registro de Créditos</h1>
+  <!-- LOGIN -->
+  <div id="login-container" class="login-container">
+    <h1>🔒 Acceso a Créditos</h1>
+    <input type="text" id="username" placeholder="Usuario">
+    <input type="password" id="password" placeholder="Contraseña">
+    <button id="btnLogin">Ingresar</button>
+    <p id="login-error" style="color:red; display:none;">Usuario o contraseña incorrectos</p>
+  </div>
 
+  <!-- APP PRINCIPAL -->
+  <div id="app-container" class="container" style="display:none;">
+    <h1>📊 Registro de Créditos</h1>
     <table id="tabla-creditos">
       <thead>
         <tr>
@@ -21,7 +30,7 @@
           <th>Monto prestado</th>
           <th>Modalidad</th>
           <th>Estado</th>
-           <th>⚠️</th>
+          <th>⚠️</th>
         </tr>
       </thead>
       <tbody></tbody>

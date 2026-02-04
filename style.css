@@ -1,3 +1,36 @@
+/* ===== LOGIN ===== */
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-container input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.login-container button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.login-container button:hover {
+  background: #34495e;
+}
+
+/* ===== APP PRINCIPAL ===== */
 * {
   box-sizing: border-box;
   font-family: Arial, Helvetica, sans-serif;
@@ -99,6 +132,7 @@ tbody tr:hover {
   background: #34495e;
   color: white;
 }
+
 .alerta-icono {
   font-size: 22px;
   color: #e67e22;
@@ -110,4 +144,3 @@ tbody tr:hover {
   50% { opacity: 0.4; }
   100% { opacity: 1; }
 }
-
