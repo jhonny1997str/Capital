@@ -2,7 +2,7 @@
 // LOGIN
 // ===============================
 const USER = "capital";          // Usuario
-const PASS = "solocali123#";     // Contraseña
+const PASS = "6103";     // Contraseña
 
 const loginContainer = document.getElementById("login-container");
 const appContainer = document.getElementById("app-container");
