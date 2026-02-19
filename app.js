@@ -32,13 +32,14 @@ const detallesCreditos = {
   "C-004": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaB5vES-3u5Zizdl1JovcH9wMUGcd9hunADx2GFK3iogBapIjFaXg7CZhBoFohqx28_xDih2Esntud/pub?gid=0&single=true&output=csv",
   "C-005": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCFB7k_NsO6s77IBZmOkjJoA67I1MgYbiHPw_IEgnTri8Y6mBJScsE5TUgNoGDo4u-QtVEH3Mr3kop/pub?gid=0&single=true&output=csv",
   "C-006": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTUrvX2PomZtV11T9fpGtgTZWQo98454gsmZSFyGiJSVtTpivEsgul-t6IIN3UXPyJZaNa-o8R1W7X/pub?gid=0&single=true&output=csv",
-  "C-007": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFMr44XLnjEzgR2pQZ5ImvgiFF7NDQ3-RT57NBBHPN2OTPzDcEF8o64k72eMOcjBzDB-oNvGAkzAKu/pub?gid=0&single=true&output=csv"
+  "C-007": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFMr44XLnjEzgR2pQZ5ImvgiFF7NDQ3-RT57NBBHPN2OTPzDcEF8o64k72eMOcjBzDB-oNvGAkzAKu/pub?gid=0&single=true&output=csv",
+  "C-008": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcf7AM4XqQ6BqGSBelGEmzF1hnS11ov-_xNqDsjcXQIZEGt8zIqH7A9MmeCDe53GDRsNiurk-uyXYa/pub?gid=0&single=true&output=csv"
 };
 
 // ===============================
 // CONFIG ALERTAS
 // ===============================
-const diasAntesAlerta = 100; // 🔴 Pruebas, luego vuelve a 3
+const diasAntesAlerta = 3; // 🔴 Pruebas, luego vuelve a 3
 
 // ===============================
 // VARIABLES PDF
