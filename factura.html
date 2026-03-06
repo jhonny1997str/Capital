@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Factura Tienda MAJU</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.9.2/html2pdf.bundle.min.js"></script>
+
+<style>
+
+body{
+font-family: Courier New;
+max-width:280px;
+margin:auto;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+font-size:12px;
+}
+
+th,td{
+border:1px solid black;
+padding:3px;
+}
+
+input{
+width:100%;
+box-sizing:border-box;
+}
+
+button{
+margin-top:5px;
+width:100%;
+}
+
+#factura{
+width:58mm;
+padding:2mm;
+box-sizing:border-box;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<h3 style="text-align:center">FACTURACIÓN</h3>
+
+<label>Fecha</label>
+<input type="date" id="fecha">
+
+<table id="tabla">
+<tr>
+<th>Producto</th>
+<th>Cant</th>
+<th>Precio</th>
+</tr>
+</table>
+
+<button onclick="agregar()">Agregar producto</button>
+
+<h3>Total: <span id="total">0</span></h3>
+
+<button onclick="generarFactura()">Generar Factura</button>
+
+<button onclick="descargarPDF()">Descargar PDF</button>
+
+<button onclick="imprimir()">Imprimir Ticket</button>
+
+<hr>
+
+<div id="factura">
+
+<table>
+
+<tr>
+<td colspan="3" style="text-align:center">
+<b>TIENDA MAJU</b><br>
+Moda Infantil<br>
+NIT: 38684676
+</td>
+</tr>
+
+<tr>
+<td colspan="3">
+Factura: <span id="numFactura"></span><br>
+Fecha: <span id="fFecha"></span>
+</td>
+</tr>
+
+<tr>
+<th>Producto</th>
+<th>Cant</th>
+<th>Precio</th>
+</tr>
+
+<tbody id="lista"></tbody>
+
+<tr>
+<td colspan="2"><b>TOTAL</b></td>
+<td style="text-align:right"><b><span id="fTotal"></span></b></td>
+</tr>
+
+<tr>
+<td colspan="3" style="text-align:center">
+Gracias por su compra<br>
+WhatsApp: 3165700276
+</td>
+</tr>
+
+</table>
+
+</div>
+
+<script>
+
+let numero=1
+
+function formatearNumero(num){
+return new Intl.NumberFormat("es-CO").format(num)
+}
+
+function agregar(){
+
+let tabla=document.getElementById("tabla")
+
+let fila=tabla.insertRow()
+
+fila.innerHTML=`
+<td><input></td>
+<td><input type="number" onchange="calcular()"></td>
+<td><input type="number" onchange="calcular()"></td>
+`
+}
+
+function calcular(){
+
+let tabla=document.getElementById("tabla")
+
+let total=0
+
+for(let i=1;i<tabla.rows.length;i++){
+
+let cant=tabla.rows[i].cells[1].children[0].value
+let precio=tabla.rows[i].cells[2].children[0].value
+
+total+=cant*precio
+}
+
+document.getElementById("total").innerText=formatearNumero(total)
+
+}
+
+function guardarVenta(producto,cantidad,precio,total){
+
+let url="https://script.google.com/macros/s/AKfycbzScNMyA8JWUPVlWPpcTEnhchw-ejva4cdta3dFr91JjgVreDloesnPFSfkq1DCML7pTw/exec"
+
+let datos={
+factura:document.getElementById("numFactura").innerText,
+fecha:document.getElementById("fFecha").innerText,
+producto:producto,
+cantidad:cantidad,
+precio:precio,
+total:total
+}
+
+fetch(url,{
+method:"POST",
+mode:"no-cors",
+headers:{
+"Content-Type":"application/json"
+},
+body:JSON.stringify(datos)
+})
+
+}
+
+function generarFactura(){
+
+let tabla=document.getElementById("tabla")
+
+let lista=""
+
+let total=0
+
+for(let i=1;i<tabla.rows.length;i++){
+
+let prod=tabla.rows[i].cells[0].children[0].value
+let cant=tabla.rows[i].cells[1].children[0].value
+let precio=tabla.rows[i].cells[2].children[0].value
+
+let subtotal=cant*precio
+
+total+=subtotal
+
+if(prod!=""){
+
+lista+=`
+<tr>
+<td>${prod}</td>
+<td style="text-align:center">${cant}</td>
+<td style="text-align:right">${formatearNumero(precio)}</td>
+</tr>
+`
+
+guardarVenta(prod,cant,precio,subtotal)
+
+}
+
+}
+
+document.getElementById("lista").innerHTML=lista
+
+document.getElementById("fTotal").innerText=formatearNumero(total)
+
+document.getElementById("fFecha").innerText=document.getElementById("fecha").value
+
+document.getElementById("numFactura").innerText="F-"+numero
+
+numero++
+
+}
+
+function descargarPDF(){
+
+let elemento = document.getElementById("factura")
+
+let opciones = {
+margin: 0,
+filename: 'factura_maju.pdf',
+image: { type: 'jpeg', quality: 1 },
+html2canvas: { scale: 3 },
+jsPDF: {
+unit: 'mm',
+format: [58,200],
+orientation: 'portrait'
+}
+}
+
+html2pdf().set(opciones).from(elemento).save()
+
+}
+
+function imprimir(){
+
+let contenido=document.getElementById("factura").innerHTML
+
+let ventana=window.open()
+
+ventana.document.write(contenido)
+
+ventana.print()
+
+}
+
+agregar()
+
+</script>
+
+</body>
+</html>
