@@ -40,13 +40,83 @@ const detallesCreditos = {
   "C-012": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJBrk4eDD6yC4YU8FyenPKByJnLK_KTVLhYc_CJMCZA12lwk-_49QSnkm14Y8t8Ib1uK4ZyljM1Nqp/pub?gid=0&single=true&output=csv",
   "C-013": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRihvfAM2Xxk9k8iSKpnGfywM05sMfGPYbpDezZDSJoYJfQqmb-uG6V2U1iMii9NW85uW7JFFsk_ypA/pub?gid=0&single=true&output=csv",
   "C-014": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTa0wno8sS9JKluKQylNhyybQRjL_b66cO7jjfzLgkz1dHpOVelSfDb5AUys2Mqm8bTrx8fzTm9WtdU/pub?gid=0&single=true&output=csv",
-  "C-015": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPkGU0uqH21gk6xwdvgS1nef-cabXSn9mMU2SbxVZ5GQz7iT6kxelaujKgdyJij_hhBlEL5F7Xbpt/pub?gid=0&single=true&output=csv"
+  "C-015": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPkGU0uqH21gk6xwdvgS1nef-cabXSn9mMU2SbxVZ5GQz7iT6kxelaujKgdyJij_hhBlEL5F7Xbpt/pub?gid=0&single=true&output=csv",
+  "C-016": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlxG45Z8Y6LZqXkdbxX2L3y2OpDv5sVHcKlCmQQhm4kFL48JLYUTmOuRN1DaSnyWSWn_MGhuLsNSUp/pub?gid=0&single=true&output=csv"
 };
+
+// ===============================
+// NUEVO: LÓGICA DEL RESUMEN FINANCIERO
+// ===============================
+const btnVerResumen = document.getElementById("btnVerResumen");
+const resumenContainer = document.getElementById("resumen-container");
+
+btnVerResumen.onclick = () => {
+    if (resumenContainer.style.display === "none") {
+        resumenContainer.style.display = "block";
+        btnVerResumen.innerText = "✖️ Cerrar Resumen";
+        cargarDatosResumen();
+    } else {
+        resumenContainer.style.display = "none";
+        btnVerResumen.innerText = "📈 Ver Resumen Financiero";
+    }
+};
+
+async function cargarDatosResumen() {
+    const googleUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRka8Av_1DtWDLQmSNVfDKr9-ztFeGg4uM3cqLmLfVFjA4FtmZW2Fz7zlmG-kIdngTum3rRGhMdaKh5/pub?gid=0&single=true&output=csv';
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(googleUrl);
+
+    try {
+        const response = await fetch(proxyUrl + "&ts=" + Date.now());
+        const csvText = await response.text();
+        const rows = csvText.replace(/\r/g, '').split('\n').map(row => {
+            const result = [];
+            let current = '', inQuotes = false;
+            for (let i = 0; i < row.length; i++) {
+                if (row[i] === '"') inQuotes = !inQuotes;
+                else if (row[i] === ',' && !inQuotes) { result.push(current.trim()); current = ''; }
+                else current += row[i];
+            }
+            result.push(current.trim());
+            return result;
+        });
+
+        // ==========================================
+        // RENDER TABLA (Filas 0 a la 12 para incluir marzo)
+        // ==========================================
+        let htmlTable = '';
+        // Cambié el límite a 13 para que lea las nuevas filas de Marzo
+        for(let i = 0; i < 13; i++) { 
+            if(rows[i] && rows[i][0]) {
+                // Si la fila es un título de mes o sección, le damos un estilo diferente
+                const esTituloMes = rows[i][0].includes("Mes Actual");
+                const claseFila = esTituloMes ? "fila-especial" : "";
+                
+                htmlTable += `<tr class="${claseFila}"><td class="label-resumen">${rows[i][0]}</td><td class="value-resumen">${rows[i][1]}</td></tr>`;
+            }
+        }
+        document.getElementById('resumen-table-body').innerHTML = htmlTable;
+
+        // ==========================================
+        // RENDER INDICADORES (Lo que ya tenías)
+        // ==========================================
+        const indicators = [
+            { label: rows[1][3], val: rows[1][4], icon: '📈' },
+            { label: rows[2][3], val: rows[2][4], icon: '⚠️' },
+            { label: rows[3][3], val: rows[3][4], icon: '⚡' }
+        ];
+        document.getElementById('indicators-col-main').innerHTML = indicators.map(ind => `
+            <div class="indicator-box">
+                <span class="ind-label">${ind.icon} ${ind.label || ''}</span>
+                <span class="ind-value">${ind.val || '0'}</span>
+            </div>
+        `).join('');
+    } catch (e) { console.error("Error cargando resumen:", e); }
+}
 
 // ===============================
 // CONFIG ALERTASS
 // ===============================
-const diasAntesAlerta = 3; // 🔴 Pruebas, luego vuelve a 3
+const diasAntesAlerta = 3; 
 
 // ===============================
 // VARIABLES PDF
@@ -55,7 +125,7 @@ let datosPDF = {};
 let cuotasPDF = [];
 
 // ===============================
-// FUNCIONES
+// FUNCIONES (TAL CUAL ORIGINALES)
 // ===============================
 async function creditoTieneAlerta(numCredito) {
   const url = detallesCreditos[numCredito];
@@ -69,16 +139,15 @@ async function creditoTieneAlerta(numCredito) {
   if (inicio === -1) return false;
 
   const hoy = new Date();
-  hoy.setHours(0,0,0,0); // ignorar horas
+  hoy.setHours(0,0,0,0); 
 
-  // Buscamos solo la PRIMERA cuota pendiente
   for (let i = inicio + 1; i < filas.length; i++) {
     const f = filas[i];
-    const estado = f[6]; // Estado de Pago
-    const fechaStr = f[1]; // Fecha de Pago
+    const estado = f[6]; 
+    const fechaStr = f[1]; 
 
     if (!estado || estado !== "Pendiente") continue;
-    if (!fechaStr) return false; // si no hay fecha, no alertamos
+    if (!fechaStr) return false; 
 
     const partes = fechaStr.split("/");
     const fecha = new Date(partes[2], partes[1]-1, partes[0]);
@@ -87,18 +156,11 @@ async function creditoTieneAlerta(numCredito) {
     const diff = Math.round((fecha - hoy) / (1000 * 60 * 60 * 24));
     if (diff <= diasAntesAlerta && diff >= 0) return true;
 
-    return false; // si la primera pendiente no entra en alerta, no miramos las demás
+    return false; 
   }
-
-  return false; // no hay cuotas pendientes
+  return false; 
 }
 
-
-
-
-// ===============================
-// CARGAR TABLA PRINCIPAL
-// ===============================
 function cargarTabla() {
   const csvListado = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpu_9c9fZqHswzB37oEUUoFDVNQiykgy-Z-6ZQhAN0VfRhQdbuXSflvhhmh7VLHxA0dnWZ6u62epnX/pub?gid=830648104&single=true&output=csv";
 
@@ -135,9 +197,6 @@ function cargarTabla() {
   });
 }
 
-// ===============================
-// DETALLE DEL CRÉDITO
-// ===============================
 function abrirDetalle(numCredito) {
   const csvDetalle = detallesCreditos[numCredito];
   if (!csvDetalle) return alert("No hay detalle");
@@ -213,7 +272,6 @@ function abrirDetalle(numCredito) {
       detalle.innerHTML = html;
       document.getElementById("modal").style.display = "flex";
 
-      // Botones
       document.getElementById("btnPDF").onclick = generarPDF;
       const btnPaz = document.getElementById("btnPazYSalvo");
       if (btnPaz) btnPaz.onclick = generarPazYSalvoPDF;
@@ -221,15 +279,12 @@ function abrirDetalle(numCredito) {
   });
 }
 
-// ===============================
-// PDF ESTADO DE CUENTA (CON MARGENES)
-// ===============================
 function generarPDF() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
 
-  const margenX = 20; // margen izquierdo
-  let y = 20;         // margen superior
+  const margenX = 20; 
+  let y = 20;         
 
   pdf.setFontSize(16);
   pdf.text("ESTADO DE CUENTA", margenX, y); y += 15;
@@ -241,7 +296,7 @@ function generarPDF() {
   pdf.text(`Forma de pago: ${datosPDF.forma}`, margenX, y); y += 10;
   pdf.text(`Interés: ${datosPDF.interes} %`, margenX, y); y += 10;
   pdf.text(`Capital prestado: $${datosPDF.capital}`, margenX, y); y += 10;
-  pdf.text(`Total a pagar: $${datosPDF.total}`, margenX, y); y += 15; // espacio extra antes de tabla
+  pdf.text(`Total a pagar: $${datosPDF.total}`, margenX, y); y += 15; 
 
   pdf.autoTable({
     startY: y,
@@ -254,9 +309,6 @@ function generarPDF() {
   pdf.save(`estado_cuenta_${datosPDF.credito}.pdf`);
 }
 
-// ===============================
-// PDF PAZ Y SALVO (CON MARGENES)
-// ===============================
 function generarPazYSalvoPDF() {
   const { jsPDF } = window.jspdf;
   const pdf = new jsPDF();
@@ -284,8 +336,5 @@ function generarPazYSalvoPDF() {
   pdf.save(`paz_y_salvo_${datosPDF.credito}.pdf`);
 }
 
-// ===============================
-// CERRAR MODAL
-// ===============================
 document.getElementById("cerrar").onclick = () =>
   (document.getElementById("modal").style.display = "none");

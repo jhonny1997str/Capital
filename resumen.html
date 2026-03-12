@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resumen de Finanzas</title>
+    <style>
+        :root { --primary: #2c3e50; --accent: #27ae60; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1100px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); font-weight: 300; }
+        .grid { display: grid; grid-template-columns: 1.4fr 1.1fr; gap: 25px; }
+        .card { background: var(--white); padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 11px; text-transform: uppercase; color: #aaa; padding: 10px 5px; border-bottom: 2px solid #eee; }
+        td { padding: 14px 5px; border-bottom: 1px solid #f9f9f9; font-size: 15px; }
+        .label { font-weight: 600; color: #555; font-style: italic; }
+        .value { font-family: 'Courier New', monospace; font-weight: bold; text-align: right; color: #000 !important; }
+        .desc { font-size: 12px; color: #999; }
+        .indicator-box { background: #fff; margin-bottom: 15px; padding: 20px; border-radius: 12px; border-left: 6px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .ind-label { font-size: 14px; color: #7f8c8d; font-weight: bold; }
+        .ind-value { font-size: 32px; color: var(--accent); font-weight: 800; display: block; margin-top: 5px; }
+        .ind-expl { font-size: 12px; color: #95a5a6; margin-top: 5px; line-height: 1.4; }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header><h1>Control de Finanzas</h1></header>
+    <div id="status" style="text-align:center; padding: 20px;">Iniciando conexión...</div>
+    <div id="main-content" class="grid" style="display:none;">
+        <div class="card">
+            <table>
+                <thead>
+                    <tr><th>Concepto</th><th style="text-align:right">Valor</th><th>Descripción</th></tr>
+                </thead>
+                <tbody id="table-body"></tbody>
+            </table>
+        </div>
+        <div id="indicators-col"></div>
+    </div>
+</div>
+
+<script>
+    // Usamos un proxy público para evitar el error de CORS (conexión bloqueada)
+    const googleUrl = 'https://docs.google.com/spreadsheets/d/e/2PACX-1vRka8Av_1DtWDLQmSNVfDKr9-ztFeGg4uM3cqLmLfVFjA4FtmZW2Fz7zlmG-kIdngTum3rRGhMdaKh5/pub?gid=0&single=true&output=csv';
+    const proxyUrl = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(googleUrl);
+
+    async function loadData() {
+        const statusDiv = document.getElementById('status');
+        try {
+            const response = await fetch(proxyUrl);
+            if (!response.ok) throw new Error('No se pudo obtener respuesta');
+            
+            const csvText = await response.text();
+            // Limpiamos retornos de carro y dividimos por filas
+            const rows = csvText.replace(/\r/g, '').split('\n').map(row => parseCSVLine(row));
+            
+            renderTable(rows);
+            renderIndicators(rows);
+
+            statusDiv.style.display = 'none';
+            document.getElementById('main-content').style.display = 'grid';
+        } catch (e) {
+            statusDiv.innerHTML = "⚠️ Error de conexión. <br><small>Verifica que el link de Google Sheets sea público.</small>";
+            console.error(e);
+        }
+    }
+
+    // Función inteligente para leer CSV sin romper decimales ni comillas
+    function parseCSVLine(line) {
+        const result = [];
+        let current = '';
+        let inQuotes = false;
+        for (let i = 0; i < line.length; i++) {
+            const char = line[i];
+            if (char === '"') inQuotes = !inQuotes;
+            else if (char === ',' && !inQuotes) {
+                result.push(current.trim());
+                current = '';
+            } else current += char;
+        }
+        result.push(current.trim());
+        return result;
+    }
+
+    function renderTable(rows) {
+        const tbody = document.getElementById('table-body');
+        let html = '';
+        for(let i = 0; i < 9; i++) {
+            if(!rows[i] || rows[i].length < 2) continue;
+            html += `<tr>
+                <td class="label">${rows[i][0]}</td>
+                <td class="value">${rows[i][1]}</td>
+                <td class="desc">${rows[i][2] || ''}</td>
+            </tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+
+    function renderIndicators(rows) {
+        const container = document.getElementById('indicators-col');
+        // Extraemos Rentabilidad (Fila 2), Riesgo (Fila 3), Eficiencia (Fila 4)
+        const indicators = [
+            { label: rows[1][3], val: rows[1][4], desc: rows[1][5], icon: '📈' },
+            { label: rows[2][3], val: rows[2][4], desc: rows[2][5], icon: '⚠️' },
+            { label: rows[3][3], val: rows[3][4], desc: rows[3][5], icon: '⚡' }
+        ];
+
+        container.innerHTML = indicators.map(ind => `
+            <div class="indicator-box">
+                <span class="ind-label">${ind.icon} ${ind.label || ''}</span>
+                <span class="ind-value">${ind.val || '0'}</span>
+                <span class="ind-expl">${ind.desc || ''}</span>
+            </div>
+        `).join('');
+    }
+
+    loadData();
+</script>
+</body>
+</html>

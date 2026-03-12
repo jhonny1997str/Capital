@@ -8,7 +8,6 @@
 </head>
 <body>
 
-  <!-- LOGIN -->
   <div id="login-container" class="login-container">
     <h1>🔒 Acceso a Créditos</h1>
     <input type="text" id="username" placeholder="Usuario">
@@ -17,9 +16,25 @@
     <p id="login-error" style="color:red; display:none;">Usuario o contraseña incorrectos</p>
   </div>
 
-  <!-- APP PRINCIPAL -->
   <div id="app-container" class="container" style="display:none;">
-    <h1>📊 Registro de Créditos</h1>
+    <div class="header-flex">
+        <h1>📊 Registro de Créditos</h1>
+        <button id="btnVerResumen">📈 Ver Resumen Financiero</button>
+    </div>
+
+    <div id="resumen-container" style="display:none;">
+        <div class="grid-resumen">
+            <div class="card-resumen">
+                <h3 style="margin-top:0; color: #2c3e50;">Estado de Inversión</h3>
+                <table>
+                    <tbody id="resumen-table-body"></tbody>
+                </table>
+            </div>
+            <div id="indicators-col-main"></div>
+        </div>
+        <hr style="margin: 20px 0; border: 0; border-top: 1px solid #eee;">
+    </div>
+
     <table id="tabla-creditos">
       <thead>
         <tr>
@@ -37,7 +52,6 @@
     </table>
   </div>
 
-  <!-- MODAL -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <span id="cerrar">&times;</span>
@@ -45,12 +59,10 @@
     </div>
   </div>
 
-  <!-- LIBRERÍAS -->
   <script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.31/jspdf.plugin.autotable.min.js"></script>
 
-  <!-- TU APP -->
   <script src="app.js"></script>
 
 </body>

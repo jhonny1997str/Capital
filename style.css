@@ -24,6 +24,183 @@
   color: white;
   border: none;
   border-radius: 5px;
+}/* ===== LOGIN ===== */
+.login-container {
+  max-width: 400px;
+  margin: 100px auto;
+  padding: 30px;
+  background: #ffffff;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.login-container input {
+  width: 80%;
+  padding: 10px;
+  margin: 10px 0;
+  font-size: 16px;
+}
+
+.login-container button {
+  padding: 10px 20px;
+  font-size: 16px;
+  cursor: pointer;
+  background: #2c3e50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+}
+
+.login-container button:hover {
+  background: #34495e;
+}
+
+/* ===== APP PRINCIPAL ===== */
+* {
+  box-sizing: border-box;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #f4f6f8;
+  padding: 20px;
+}
+
+.container {
+  max-width: 1100px;
+  margin: auto;
+  background: #ffffff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+}
+
+.header-flex {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+h1 {
+  text-align: center;
+  margin: 0;
+  color: #2c3e50;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+thead {
+  background: #2c3e50;
+  color: white;
+}
+
+th, td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+tbody tr:hover {
+  background: #f1f1f1;
+  cursor: pointer;
+}
+
+.estado-activo {
+  color: #2ecc71;
+  font-weight: bold;
+}
+
+.estado-cancelado {
+  color: #e74c3c;
+  font-weight: bold;
+}
+
+/* ===== SECCIÓN RESUMEN FINANCIERO ===== */
+#btnVerResumen {
+  background: #27ae60;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+.grid-resumen {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 25px;
+  padding: 10px 0;
+}
+
+#resumen-table-body td {
+  text-align: left;
+  padding: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.indicator-box {
+  background: #fff;
+  margin-bottom: 10px;
+  padding: 15px;
+  border-radius: 10px;
+  border-left: 6px solid #27ae60;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+.ind-label { font-size: 13px; color: #7f8c8d; font-weight: bold; }
+.ind-value { font-size: 24px; color: #27ae60; font-weight: 800; display: block; }
+
+/* ===== MODAL ===== */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  width: 90%;
+  max-width: 750px;
+  border-radius: 10px;
+  position: relative;
+  max-height: 90vh;
+  overflow-y: auto;
+}
+
+#cerrar {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 22px;
+  cursor: pointer;
+}
+
+.alerta-icono {
+  font-size: 22px;
+  color: #e67e22;
+  animation: parpadeo 1s infinite;
+}
+
+@keyframes parpadeo {
+  0% { opacity: 1; }
+  50% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+@media (max-width: 768px) {
+    .grid-resumen { grid-template-columns: 1fr; }
+    .header-flex { flex-direction: column; gap: 15px; }
 }
 
 .login-container button:hover {
@@ -143,4 +320,34 @@ tbody tr:hover {
   0% { opacity: 1; }
   50% { opacity: 0.4; }
   100% { opacity: 1; }
+}
+
+/* ===== ESTILOS PARA LAS FILAS DE MARZO (MES ACTUAL) ===== */
+.fila-especial {
+    background-color: #ebf5fb !important; /* Un azul claro para diferenciar el mes */
+    border-left: 4px solid #3498db;
+}
+
+.fila-especial td {
+    font-weight: bold;
+    color: #2c3e50;
+    padding-top: 12px !important;
+    padding-bottom: 12px !important;
+}
+
+.label-resumen {
+    font-weight: 600;
+    color: #34495e;
+}
+
+.value-resumen {
+    font-family: 'Courier New', Courier, monospace; /* Estilo contable */
+    font-weight: bold;
+    text-align: right !important;
+    color: #27ae60;
+}
+
+/* Separador visual antes de empezar los datos de Marzo */
+#resumen-table-body tr:nth-child(10) {
+    border-top: 2px solid #bdc3c7;
 }
