@@ -43,7 +43,10 @@ const detallesCreditos = {
   "C-015": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPkGU0uqH21gk6xwdvgS1nef-cabXSn9mMU2SbxVZ5GQz7iT6kxelaujKgdyJij_hhBlEL5F7Xbpt/pub?gid=0&single=true&output=csv",
   "C-016": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlxG45Z8Y6LZqXkdbxX2L3y2OpDv5sVHcKlCmQQhm4kFL48JLYUTmOuRN1DaSnyWSWn_MGhuLsNSUp/pub?gid=0&single=true&output=csv",
   "C-017": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHcsk94l3D0VTnDzoS8XbGAJy_K1SUN8peOYV4tBeENN4Smc8Wf1Tbh37xyc6b955yNCSYisDTCNbz/pub?gid=0&single=true&output=csv",
-  "C-018": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0iIJS4JCV9qgp1rH_s8Bk_AO6tdRUnEWu_WujgYqU5T1EHpU11xROzcLucg91OfSN-wN9wMsRT3l/pub?gid=0&single=true&output=csv"
+  "C-018": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0iIJS4JCV9qgp1rH_s8Bk_AO6tdRUnEWu_WujgYqU5T1EHpU11xROzcLucg91OfSN-wN9wMsRT3l/pub?gid=0&single=true&output=csv",
+  "C-019": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLmYhQuttH_Sv7ZvKJJ-iYH3C0UBe91PkofGOo5iUXvawklXUnTNqEE8Sq-UO5zXphXE6zNhbhNmqp/pub?gid=0&single=true&output=csv",
+  "C-020": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRSKduHyAxfSNrJufJPxVk0YiVe6j1RTjVIQZ7aFX1lg9XNsxg4IWg2f-C_OX5VZTt9GyzdfEXL8ZNv/pub?gid=0&single=true&output=csv",
+  "C-021": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRcooCSTStZ6tlisyddohSELyhtz3o3bM8WstH9OHHmPDTXVZUeKDTtAIyf0RT7tkgP7ZCBM7sLbmO/pub?gid=0&single=true&output=csv"
 };
 
 // ===============================
