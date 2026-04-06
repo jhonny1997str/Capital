@@ -48,7 +48,10 @@ const detallesCreditos = {
   "C-020": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRSKduHyAxfSNrJufJPxVk0YiVe6j1RTjVIQZ7aFX1lg9XNsxg4IWg2f-C_OX5VZTt9GyzdfEXL8ZNv/pub?gid=0&single=true&output=csv",
   "C-021": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRcooCSTStZ6tlisyddohSELyhtz3o3bM8WstH9OHHmPDTXVZUeKDTtAIyf0RT7tkgP7ZCBM7sLbmO/pub?gid=0&single=true&output=csv",
   "C-022": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvhCYzm_zLxFKh9ByF4xPE0CngGWVEAIXjGnPGJzZsJH2pU076QrlCMM7nMWGW30FT5Xdhf4IkXoAK/pub?gid=0&single=true&output=csv",
-  "C-023": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpcbWeYcBADYfVHKAtz9MZrJxgDTIlmBIRTK85bLUg2hmN48iuyxm5IFNCibLwySpVjeyRXXheMiua/pub?gid=0&single=true&output=csv"
+  "C-023": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpcbWeYcBADYfVHKAtz9MZrJxgDTIlmBIRTK85bLUg2hmN48iuyxm5IFNCibLwySpVjeyRXXheMiua/pub?gid=0&single=true&output=csv",
+  "C-024": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-8v2vqLbzHnG52YxobScispc8PEveZRNZitPIU-WKoc8WLHG5jONDa9xbZNfHrtjiwwn-C490yQeK/pub?gid=0&single=true&output=csv",
+  "C-025": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSf96zYeovfpkWvvFlJq5HmSmK8jOKD_mRk1O1OzH55JYPWvxhA_8A059juUMTTugsBm__Neax2y1Fn/pub?gid=0&single=true&output=csv",
+  "C-026": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSbNleP9kcxYIpPh_kWOtwers9hvhe41K6oLWTcMlPq7CPRUCtrmi7uCsLc-RoGV5NHbneKBXTeXZzX/pub?gid=0&single=true&output=csv"
 };
 
 // ===============================
