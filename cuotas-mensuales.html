@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cuotas Mensuales</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        :root { --primary: #2c3e50; --accent: #27ae60; --danger: #e74c3c; --warning: #f39c12; --bg: #f4f7f6; --white: #ffffff; }
+        body { font-family: 'Segoe UI', Roboto, sans-serif; background-color: var(--bg); margin: 0; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--primary); font-weight: 300; margin: 0 0 10px 0; }
+        .mes-actual { color: #7f8c8d; font-size: 14px; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 30px; }
+        .card { background: var(--white); padding: 25px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .summary-box { display: flex; justify-content: space-around; margin-bottom: 30px; }
+        .summary-item { text-align: center; padding: 20px; background: var(--white); border-radius: 12px; flex: 1; margin: 0 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.04); }
+        .summary-label { font-size: 12px; text-transform: uppercase; color: #95a5a6; font-weight: bold; margin-bottom: 8px; }
+        .summary-value { font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace; }
+        .pagado { color: var(--accent); }
+        .pendiente { color: var(--danger); }
+        .total { color: var(--primary); }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; font-size: 11px; text-transform: uppercase; color: #aaa; padding: 12px 8px; border-bottom: 2px solid #eee; background: #f9f9f9; }
+        td { padding: 12px 8px; border-bottom: 1px solid #f0f0f0; font-size: 14px; }
+        tr:hover { background-color: #f9f9f9; }
+        .estado-pagado { color: var(--accent); font-weight: bold; }
+        .estado-pendiente { color: var(--danger); font-weight: bold; }
+        .valor { font-family: 'Courier New', monospace; font-weight: bold; text-align: right; }
+        .seccion-titulo { font-size: 16px; font-weight: 600; color: var(--primary); margin-top: 30px; margin-bottom: 15px; padding-bottom: 10px; border-bottom: 2px solid var(--accent); }
+        .sin-datos { text-align: center; color: #95a5a6; padding: 30px; font-style: italic; }
+        .loading { text-align: center; padding: 40px; color: #7f8c8d; }
+        .back-button { display: inline-block; margin-bottom: 20px; padding: 10px 15px; background: var(--primary); color: var(--white); text-decoration: none; border-radius: 6px; font-size: 14px; }
+        .back-button:hover { background: #1a252f; }
+        button { transition: all 0.3s ease; }
+        button:hover { transform: translateY(-2px); box-shadow: 0 4px 8px rgba(0,0,0,0.15); }
+        @media (max-width: 768px) { .grid { grid-template-columns: 1fr; } .summary-box { flex-direction: column; } .summary-item { margin: 10px 0; } }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <a href="index.html" class="back-button">← Volver</a>
+    <header>
+        <h1>📅 Cuotas del Mes Actual</h1>
+        <div class="mes-actual" id="mes-actual">Cargando...</div>
+    </header>
+
+    <div id="loading" class="loading">⏳ Procesando datos de todos los créditos...</div>
+    
+    <div id="main-content" style="display: none;">
+        <!-- NAVEGACIÓN DE MESES -->
+        <div style="text-align: center; margin-bottom: 30px; display: flex; justify-content: center; gap: 15px;">
+            <button id="btn-mes-anterior" style="padding: 12px 20px; background: #34495e; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s;">← Mes Anterior</button>
+            <div style="padding: 12px 20px; background: white; border-radius: 6px; border: 2px solid #27ae60; font-weight: bold; color: #2c3e50; min-width: 150px; text-align: center;" id="mes-selector">Abril 2026</div>
+            <button id="btn-mes-siguiente" style="padding: 12px 20px; background: #27ae60; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s;">Mes Siguiente →</button>
+        </div>
+
+        <!-- BOTÓN TOTAL AÑO -->
+        <div style="text-align: center; margin-bottom: 30px;">
+            <button id="btn-total-anio" style="padding: 15px 30px; background: linear-gradient(135deg, #e67e22, #d35400); color: white; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 16px; transition: all 0.3s; box-shadow: 0 4px 6px rgba(0,0,0,0.1); display: flex; align-items: center; justify-content: center; gap: 15px; margin: 0 auto;">
+                <div>
+                    <div>💹 VER PATRIMONIO TOTAL DEL AÑO 2026</div>
+                    <div style="font-size: 12px; margin-top: 5px; opacity: 0.9;">
+                        <span id="porcentaje-logro">0%</span> de $35.000.000
+                    </div>
+                </div>
+                <div style="width: 80px; height: 60px; background: rgba(255,255,255,0.2); border-radius: 6px; display: flex; flex-direction: column; align-items: center; justify-content: center;">
+                    <div style="width: 70px; height: 6px; background: rgba(255,255,255,0.3); border-radius: 3px; overflow: hidden;">
+                        <div id="barra-progreso" style="width: 0%; height: 100%; background: #2ecc71; transition: width 0.3s ease;"></div>
+                    </div>
+                    <div style="font-size: 10px; margin-top: 3px;" id="texto-progreso">0%</div>
+                </div>
+            </button>
+        </div>
+
+        <!-- RESUMEN TOTAL AÑO (OCULTO POR DEFECTO) -->
+        <div id="total-anio-container" style="background: linear-gradient(135deg, #2c3e50, #34495e); color: white; padding: 40px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 8px 16px rgba(0,0,0,0.15); display: none;">
+            <div style="font-size: 24px; font-weight: bold; margin-bottom: 30px; text-align: center;">💰 PATRIMONIO TOTAL 2026</div>
+            <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;">
+                <!-- VALOR TOTAL -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">💰 Valor Total Pagado</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-valor-pagado">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">⚠️ Valor Total Pendiente</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-valor-pendiente">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">📊 Valor Total General</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-valor-total">$0,00</div>
+                </div>
+                <!-- CAPITAL TOTAL -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">💵 Capital Total Pagado</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-capital-pagado">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">📈 Capital Total Pendiente</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-capital-pendiente">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">🏦 Capital Total General</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-capital-total">$0,00</div>
+                </div>
+                <!-- INTERÉS TOTAL -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">💸 Interés Total Pagado</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-interes-pagado">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">📊 Interés Total Pendiente</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-interes-pendiente">$0,00</div>
+                </div>
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.1); border-radius: 8px;">
+                    <div style="font-size: 12px; text-transform: uppercase; opacity: 0.8; margin-bottom: 10px;">💹 Interés Total General</div>
+                    <div style="font-size: 28px; font-weight: 800; font-family: 'Courier New', monospace;" id="anio-interes-total">$0,00</div>
+                </div>
+            </div>
+        </div>
+
+        
+        <div class="summary-box">
+            <div class="summary-item">
+                <div class="summary-label">💰 Total Pagado</div>
+                <div class="summary-value pagado" id="total-pagado">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">⚠️ Total Pendiente</div>
+                <div class="summary-value pendiente" id="total-pendiente">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">📊 Total General</div>
+                <div class="summary-value total" id="total-general">$0</div>
+            </div>
+        </div>
+
+        <!-- RESUMEN CAPITAL -->
+        <div class="summary-box">
+            <div class="summary-item">
+                <div class="summary-label">💵 Capital Pagado</div>
+                <div class="summary-value pagado" id="capital-pagado">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">📈 Capital Pendiente</div>
+                <div class="summary-value pendiente" id="capital-pendiente">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">🏦 Total Capital</div>
+                <div class="summary-value total" id="capital-total">$0</div>
+            </div>
+        </div>
+
+        <!-- RESUMEN INTERÉS -->
+        <div class="summary-box">
+            <div class="summary-item">
+                <div class="summary-label">💸 Interés Pagado</div>
+                <div class="summary-value pagado" id="interes-pagado">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">📊 Interés Pendiente</div>
+                <div class="summary-value pendiente" id="interes-pendiente">$0</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">💹 Total Interés</div>
+                <div class="summary-value total" id="interes-total">$0</div>
+            </div>
+        </div>
+
+        <!-- CUOTAS PAGADAS -->
+        <div class="card">
+            <div class="seccion-titulo">✅ Cuotas Pagadas</div>
+            <table id="tabla-pagadas">
+                <thead>
+                    <tr>
+                        <th>Crédito</th>
+                        <th>Cliente</th>
+                        <th>Cuota #</th>
+                        <th>Fecha</th>
+                        <th style="text-align: right;">Valor</th>
+                        <th style="text-align: right;">Capital</th>
+                        <th style="text-align: right;">Interés</th>
+                    </tr>
+                </thead>
+                <tbody id="body-pagadas"></tbody>
+            </table>
+            <div id="sin-pagadas" class="sin-datos">No hay cuotas pagadas en este mes</div>
+        </div>
+
+        <!-- CUOTAS PENDIENTES -->
+        <div class="card">
+            <div class="seccion-titulo">⏰ Cuotas Pendientes</div>
+            <table id="tabla-pendientes">
+                <thead>
+                    <tr>
+                        <th>Crédito</th>
+                        <th>Cliente</th>
+                        <th>Cuota #</th>
+                        <th>Fecha</th>
+                        <th style="text-align: right;">Valor</th>
+                        <th style="text-align: right;">Capital</th>
+                        <th style="text-align: right;">Interés</th>
+                    </tr>
+                </thead>
+                <tbody id="body-pendientes"></tbody>
+            </table>
+            <div id="sin-pendientes" class="sin-datos">No hay cuotas pendientes en este mes</div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script>
+<script>
+    // Mapa de créditos (igual al de app.js)
+    const detallesCreditos = {
+        "C-001": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRUP8NXUQ6ybdvdLXFQDEvzDwNZ13fOQu3k_gaVilaA98jX5hAKXTsgjpZci15L40gVWWKUdI3rfIzU/pub?gid=0&single=true&output=csv",
+        "C-002": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTPqHc_-dtYWDYnx2A6RUhuy8PesqVdP0HghsbWNtW1A7ahorb306Dr52VDSElU4LtsGdDl48eJaIPA/pub?gid=0&single=true&output=csv",
+        "C-003": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTl4lIXYBv7ivRSCwi-TRuHu5yDjk4G2rQbgXcVijc_bNj4GTPEiTXZPxY6kpQFCXdfSGbtqGAmt5rU/pub?gid=0&single=true&output=csv",
+        "C-004": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTaB5vES-3u5Zizdl1JovcH9wMUGcd9hunADx2GFK3iogBapIjFaXg7CZhBoFohqx28_xDih2Esntud/pub?gid=0&single=true&output=csv",
+        "C-005": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTCFB7k_NsO6s77IBZmOkjJoA67I1MgYbiHPw_IEgnTri8Y6mBJScsE5TUgNoGDo4u-QtVEH3Mr3kop/pub?gid=0&single=true&output=csv",
+        "C-006": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRTUrvX2PomZtV11T9fpGtgTZWQo98454gsmZSFyGiJSVtTpivEsgul-t6IIN3UXPyJZaNa-o8R1W7X/pub?gid=0&single=true&output=csv",
+        "C-007": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTFMr44XLnjEzgR2pQZ5ImvgiFF7NDQ3-RT57NBBHPN2OTPzDcEF8o64k72eMOcjBzDB-oNvGAkzAKu/pub?gid=0&single=true&output=csv",
+        "C-008": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQcf7AM4XqQ6BqGSBelGEmzF1hnS11ov-_xNqDsjcXQIZEGt8zIqH7A9MmeCDe53GDRsNiurk-uyXYa/pub?gid=0&single=true&output=csv",
+        "C-009": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTBzbZi_ikQotLpajVKTW6wQHY-zEyc180uq_16PpShz-4xYAiKhmrPN6MEzVMANtag4b9EvopzqaL6/pub?gid=0&single=true&output=csv",
+        "C-010": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQA0xOICfUWBhTsvles52zznt5-dBu_VVJ_Fs1CriV6qEsK4Mt87EddNJSzvUo5hVjyQa4bzxN6nIIx/pub?gid=0&single=true&output=csv",
+        "C-011": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQU58MJpyiudnMZfXB1bdpxjUdsNnIVh-1KeY5crD63JZxeOCtO9dHYQpRjKo7O1s6g8ULMuclPSFdn/pub?gid=0&single=true&output=csv",
+        "C-012": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSJBrk4eDD6yC4YU8FyenPKByJnLK_KTVLhYc_CJMCZA12lwk-_49QSnkm14Y8t8Ib1uK4ZyljM1Nqp/pub?gid=0&single=true&output=csv",
+        "C-013": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRihvfAM2Xxk9k8iSKpnGfywM05sMfGPYbpDezZDSJoYJfQqmb-uG6V2U1iMii9NW85uW7JFFsk_ypA/pub?gid=0&single=true&output=csv",
+        "C-014": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTa0wno8sS9JKluKQylNhyybQRjL_b66cO7jjfzLgkz1dHpOVelSfDb5AUys2Mqm8bTrx8fzTm9WtdU/pub?gid=0&single=true&output=csv",
+        "C-015": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvPkGU0uqH21gk6xwdvgS1nef-cabXSn9mMU2SbxVZ5GQz7iT6kxelaujKgdyJij_hhBlEL5F7Xbpt/pub?gid=0&single=true&output=csv",
+        "C-016": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQlxG45Z8Y6LZqXkdbxX2L3y2OpDv5sVHcKlCmQQhm4kFL48JLYUTmOuRN1DaSnyWSWn_MGhuLsNSUp/pub?gid=0&single=true&output=csv",
+        "C-017": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTHcsk94l3D0VTnDzoS8XbGAJy_K1SUN8peOYV4tBeENN4Smc8Wf1Tbh37xyc6b955yNCSYisDTCNbz/pub?gid=0&single=true&output=csv",
+        "C-018": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRU0iIJS4JCV9qgp1rH_s8Bk_AO6tdRUnEWu_WujgYqU5T1EHpU11xROzcLucg91OfSN-wN9wMsRT3l/pub?gid=0&single=true&output=csv",
+        "C-019": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRLmYhQuttH_Sv7ZvKJJ-iYH3C0UBe91PkofGOo5iUXvawklXUnTNqEE8Sq-UO5zXphXE6zNhbhNmqp/pub?gid=0&single=true&output=csv",
+        "C-020": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRSKduHyAxfSNrJufJPxVk0YiVe6j1RTjVIQZ7aFX1lg9XNsxg4IWg2f-C_OX5VZTt9GyzdfEXL8ZNv/pub?gid=0&single=true&output=csv",
+        "C-021": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRRcooCSTStZ6tlisyddohSELyhtz3o3bM8WstH9OHHmPDTXVZUeKDTtAIyf0RT7tkgP7ZCBM7sLbmO/pub?gid=0&single=true&output=csv",
+        "C-022": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRvhCYzm_zLxFKh9ByF4xPE0CngGWVEAIXjGnPGJzZsJH2pU076QrlCMM7nMWGW30FT5Xdhf4IkXoAK/pub?gid=0&single=true&output=csv",
+        "C-023": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpcbWeYcBADYfVHKAtz9MZrJxgDTIlmBIRTK85bLUg2hmN48iuyxm5IFNCibLwySpVjeyRXXheMiua/pub?gid=0&single=true&output=csv",
+        "C-024": "https://docs.google.com/spreadsheets/d/e/2PACX-1vS-8v2vqLbzHnG52YxobScispc8PEveZRNZitPIU-WKoc8WLHG5jONDa9xbZNfHrtjiwwn-C490yQeK/pub?gid=0&single=true&output=csv",
+        "C-025": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSf96zYeovfpkWvvFlJq5HmSmK8jOKD_mRk1O1OzH55JYPWvxhA_8A059juUMTTugsBm__Neax2y1Fn/pub?gid=0&single=true&output=csv",
+        "C-026": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSbNleP9kcxYIpPh_kWOtwers9hvhe41K6oLWTcMlPq7CPRUCtrmi7uCsLc-RoGV5NHbneKBXTeXZzX/pub?gid=0&single=true&output=csv",
+        "C-027": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlsi-qkCptV2BLi_5vAyc4PLCttgdHq5l72C-Q3A-LozswXF-Bq9YApXGEzjJdwzVCh_cUSSixmk-H/pub?gid=0&single=true&output=csv"
+    };
+
+    // Obtener mes y año actual
+    const hoy = new Date();
+    const mesActual = hoy.getMonth();
+    const anioActual = hoy.getFullYear();
+    const meses = ['Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio', 'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'];
+    
+    document.getElementById('mes-actual').textContent = `${meses[mesActual]} de ${anioActual}`;
+
+    // Variables para almacenar datos
+    let datosPorMes = {}; // Estructura: { 3: { pagadas: [], pendientes: [] }, 4: {...} }
+    let datosClientes = {}; // Para almacenar nombres de clientes
+    let mesSeleccionado = mesActual; // Mes a mostrar (0-11)
+    
+    // Inicializar estructura para todos los meses (Enero a Diciembre)
+    for (let i = 0; i < 12; i++) {
+        datosPorMes[i] = { pagadas: [], pendientes: [] };
+    }
+
+    // Cargar información de clientes desde el listado principal
+    async function cargarClientes() {
+        const csvListado = "https://docs.google.com/spreadsheets/d/e/2PACX-1vTpu_9c9fZqHswzB37oEUUoFDVNQiykgy-Z-6ZQhAN0VfRhQdbuXSflvhhmh7VLHxA0dnWZ6u62epnX/pub?gid=830648104&single=true&output=csv";
+        
+        return new Promise((resolve) => {
+            Papa.parse(csvListado + "&ts=" + Date.now(), {
+                download: true,
+                header: true,
+                skipEmptyLines: true,
+                complete: function (results) {
+                    if (results.data && results.data.length > 0) {
+                        for (const row of results.data) {
+                            if (row["Num de Credito"]) {
+                                datosClientes[row["Num de Credito"]] = row["Nombre del Cliente"] || "Sin datos";
+                            }
+                        }
+                    }
+                    resolve();
+                },
+                error: function(e) {
+                    console.error("Error cargando clientes:", e);
+                    resolve();
+                }
+            });
+        });
+    }
+
+    // Procesar un crédito
+    async function procesarCredito(numCredito) {
+        const csvUrl = detallesCreditos[numCredito];
+        if (!csvUrl) return;
+
+        return new Promise((resolve) => {
+            Papa.parse(csvUrl + "&ts=" + Date.now(), {
+                download: true,
+                skipEmptyLines: true,
+                header: false,
+                dynamicTyping: false,
+                complete: function (results) {
+                    try {
+                        const filas = results.data;
+                        if (!filas || filas.length < 2) { resolve(); return; }
+                        
+                        // Encontrar el índice donde empieza la tabla de cuotas
+                        let inicioCuotas = -1;
+                        let encabezados = [];
+                        
+                        for (let i = 0; i < filas.length; i++) {
+                            if (filas[i][0] && filas[i][0].toString().trim() === "Num Cuota") {
+                                inicioCuotas = i;
+                                encabezados = filas[i];
+                                break;
+                            }
+                        }
+                        
+                        if (inicioCuotas === -1) { resolve(); return; }
+
+                        const cliente = datosClientes[numCredito] || "Sin datos";
+                        
+                        // Función auxiliar para obtener índice de columna
+                        const getIdx = (header) => {
+                            return encabezados.findIndex(h => h && h.toString().trim() === header);
+                        };
+
+                        // Procesar cuotas (empezar desde la fila después de encabezados)
+                        for (let i = inicioCuotas + 1; i < filas.length; i++) {
+                            const f = filas[i];
+                            if (!f || !f[0] || f[0].toString().trim() === "") continue;
+
+                            // Obtener valores con índices correctos
+                            const numCuota = f[getIdx("Num Cuota")] || f[0];
+                            const fechaStr = f[getIdx("Fecha")] || f[1];
+                            const valorStr = f[getIdx("Valor")] || f[2];
+                            const capitalStr = f[getIdx("Capital")] || f[3];
+                            const interesStr = f[getIdx("Interés")] || f[4];
+                            const estadoStr = f[getIdx("Estado")] || f[6];
+
+                            if (!fechaStr) continue;
+
+                            // Limpiar y parsear fecha DD/MM/YYYY
+                            const fechaLimpia = fechaStr.toString().trim();
+                            const partes = fechaLimpia.split("/");
+                            if (partes.length !== 3) continue;
+
+                            const fecha = new Date(parseInt(partes[2]), parseInt(partes[1]) - 1, parseInt(partes[0]));
+                            const mes = fecha.getMonth();
+                            
+                            // Procesar TODOS los meses del año actual
+                            if (fecha.getFullYear() === anioActual) {
+                                const estado = estadoStr ? estadoStr.toString().trim() : "";
+                                
+                                // Parsear valores numéricos (mejor detección de separador decimal colombiano)
+                                const limpiarNumero = (str) => {
+                                    if (!str) return 0;
+                                    let numStr = str.toString().trim();
+                                    // Remover $ y espacios
+                                    numStr = numStr.replace(/[$\s]/g, '');
+                                    
+                                    // Detectar separador decimal: el ÚLTIMO separador es el decimal
+                                    const lastCommaIdx = numStr.lastIndexOf(',');
+                                    const lastDotIdx = numStr.lastIndexOf('.');
+                                    
+                                    if (lastCommaIdx === -1 && lastDotIdx === -1) {
+                                        // Sin separadores, es un número entero
+                                        return parseFloat(numStr) || 0;
+                                    }
+                                    
+                                    // Determinar cuál es el decimal basado en cuál viene ÚLTIMO
+                                    if (lastCommaIdx > lastDotIdx) {
+                                        // La coma es el decimal (formato europeo/colombiano: 1.234,56)
+                                        numStr = numStr.replace(/\./g, '').replace(',', '.');
+                                    } else if (lastDotIdx > lastCommaIdx) {
+                                        // El punto es el decimal (formato US: 1,234.56)
+                                        numStr = numStr.replace(/,/g, '');
+                                    }
+                                    
+                                    return parseFloat(numStr) || 0;
+                                };
+
+                                const cuota = {
+                                    credito: numCredito,
+                                    cliente: cliente,
+                                    numCuota: numCuota.toString().trim(),
+                                    fecha: fechaLimpia,
+                                    valor: limpiarNumero(valorStr),
+                                    capital: limpiarNumero(capitalStr),
+                                    interes: limpiarNumero(interesStr),
+                                    estado: estado
+                                };
+
+                                if (estado === "Pagado") {
+                                    datosPorMes[mes].pagadas.push(cuota);
+                                } else if (estado === "Pendiente") {
+                                    datosPorMes[mes].pendientes.push(cuota);
+                                }
+                            }
+                        }
+                    } catch (e) {
+                        console.error(`Error procesando crédito ${numCredito}:`, e);
+                    }
+                    resolve();
+                },
+                error: function(e) {
+                    console.error(`Error descargando ${numCredito}:`, e);
+                    resolve();
+                }
+            });
+        });
+    }
+
+    // Renderizar tabla
+    function renderTabla(datos, contenedorTbody, contenedorSinDatos) {
+        const tbody = document.getElementById(contenedorTbody);
+        const sinDatos = document.getElementById(contenedorSinDatos);
+        tbody.innerHTML = '';
+
+        if (datos.length === 0) {
+            sinDatos.style.display = 'block';
+            return;
+        }
+
+        sinDatos.style.display = 'none';
+
+        datos.forEach(cuota => {
+            const fila = document.createElement('tr');
+            fila.innerHTML = `
+                <td>${cuota.credito}</td>
+                <td>${cuota.cliente}</td>
+                <td>${cuota.numCuota}</td>
+                <td>${cuota.fecha}</td>
+                <td class="valor">$${cuota.valor.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td class="valor">$${cuota.capital.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+                <td class="valor">$${cuota.interes.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}</td>
+            `;
+            tbody.appendChild(fila);
+        });
+    }
+
+    // Calcular totales del mes seleccionado
+    function calcularTotales() {
+        const cuotasPagadas = datosPorMes[mesSeleccionado].pagadas;
+        const cuotasPendientes = datosPorMes[mesSeleccionado].pendientes;
+        
+        // Totales de valor (cuota)
+        const sumaPagado = cuotasPagadas.reduce((sum, c) => sum + c.valor, 0);
+        const sumaPendiente = cuotasPendientes.reduce((sum, c) => sum + c.valor, 0);
+        const sumaTotal = sumaPagado + sumaPendiente;
+
+        // Totales de capital
+        const capitalPagado = cuotasPagadas.reduce((sum, c) => sum + c.capital, 0);
+        const capitalPendiente = cuotasPendientes.reduce((sum, c) => sum + c.capital, 0);
+        const capitalTotal = capitalPagado + capitalPendiente;
+
+        // Totales de interés
+        const interesPagado = cuotasPagadas.reduce((sum, c) => sum + c.interes, 0);
+        const interesPendiente = cuotasPendientes.reduce((sum, c) => sum + c.interes, 0);
+        const interesTotal = interesPagado + interesPendiente;
+
+        // Actualizar DOM
+        document.getElementById('total-pagado').textContent = `$${sumaPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('total-pendiente').textContent = `$${sumaPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('total-general').textContent = `$${sumaTotal.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        document.getElementById('capital-pagado').textContent = `$${capitalPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('capital-pendiente').textContent = `$${capitalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('capital-total').textContent = `$${capitalTotal.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        document.getElementById('interes-pagado').textContent = `$${interesPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('interes-pendiente').textContent = `$${interesPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('interes-total').textContent = `$${interesTotal.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+    }
+
+    // Cambiar mes y actualizar vista
+    function cambiarMes(incremento) {
+        mesSeleccionado += incremento;
+        
+        // Limitar a meses válidos (0-11)
+        if (mesSeleccionado < 0) mesSeleccionado = 0;
+        if (mesSeleccionado > 11) mesSeleccionado = 11;
+        
+        // Actualizar selector y vista
+        document.getElementById('mes-selector').textContent = `${meses[mesSeleccionado]} ${anioActual}`;
+        actualizarVista();
+    }
+
+    // Actualizar vistas con datos del mes seleccionado
+    function actualizarVista() {
+        renderTabla(datosPorMes[mesSeleccionado].pagadas, 'body-pagadas', 'sin-pagadas');
+        renderTabla(datosPorMes[mesSeleccionado].pendientes, 'body-pendientes', 'sin-pendientes');
+        calcularTotales();
+    }
+
+    // Calcular y mostrar totales del año completo
+    function calcularTotalesAnio() {
+        let totalValorPagado = 0, totalValorPendiente = 0;
+        let totalCapitalPagado = 0, totalCapitalPendiente = 0;
+        let totalInteresPagado = 0, totalInteresPendiente = 0;
+
+        // Sumar todos los meses
+        for (let mes = 0; mes < 12; mes++) {
+            const pagadas = datosPorMes[mes].pagadas;
+            const pendientes = datosPorMes[mes].pendientes;
+
+            // Sumar valores
+            totalValorPagado += pagadas.reduce((sum, c) => sum + c.valor, 0);
+            totalValorPendiente += pendientes.reduce((sum, c) => sum + c.valor, 0);
+
+            // Sumar capital
+            totalCapitalPagado += pagadas.reduce((sum, c) => sum + c.capital, 0);
+            totalCapitalPendiente += pendientes.reduce((sum, c) => sum + c.capital, 0);
+
+            // Sumar interés
+            totalInteresPagado += pagadas.reduce((sum, c) => sum + c.interes, 0);
+            totalInteresPendiente += pendientes.reduce((sum, c) => sum + c.interes, 0);
+        }
+
+        // Calcular patrimonio total y porcentaje de logro
+        const patrimonioTotal = totalCapitalPagado + totalCapitalPendiente;
+        const metaPatrimonio = 35000000;
+        const porcentajeLogro = Math.min((patrimonioTotal / metaPatrimonio) * 100, 100);
+
+        // Actualizar DOM
+        document.getElementById('anio-valor-pagado').textContent = `$${totalValorPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-valor-pendiente').textContent = `$${totalValorPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-valor-total').textContent = `$${(totalValorPagado + totalValorPendiente).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        document.getElementById('anio-capital-pagado').textContent = `$${totalCapitalPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-capital-pendiente').textContent = `$${totalCapitalPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-capital-total').textContent = `$${(totalCapitalPagado + totalCapitalPendiente).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        document.getElementById('anio-interes-pagado').textContent = `$${totalInteresPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-interes-pendiente').textContent = `$${totalInteresPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('anio-interes-total').textContent = `$${(totalInteresPagado + totalInteresPendiente).toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        // Actualizar porcentaje de logro
+        document.getElementById('porcentaje-logro').textContent = `${porcentajeLogro.toFixed(2)}%`;
+        document.getElementById('texto-progreso').textContent = `${porcentajeLogro.toFixed(1)}%`;
+        document.getElementById('barra-progreso').style.width = `${porcentajeLogro}%`;
+    }
+
+    // Event listeners para botones de navegación
+    document.getElementById('btn-mes-anterior').addEventListener('click', () => cambiarMes(-1));
+    document.getElementById('btn-mes-siguiente').addEventListener('click', () => cambiarMes(1));
+
+    // Event listener para botón de total anual
+    document.getElementById('btn-total-anio').addEventListener('click', () => {
+        const container = document.getElementById('total-anio-container');
+        if (container.style.display === 'none') {
+            calcularTotalesAnio();
+            container.style.display = 'block';
+        } else {
+            container.style.display = 'none';
+        }
+    });
+
+    // Función principal
+    async function cargarDatos() {
+        try {
+            const loadingDiv = document.getElementById('loading');
+            
+            // Cargar clientes
+            loadingDiv.textContent = '⏳ Cargando información de clientes...';
+            await cargarClientes();
+
+            // Procesar todos los créditos
+            loadingDiv.textContent = '⏳ Procesando datos de todos los créditos...';
+            const creditosArray = Object.keys(detallesCreditos);
+            
+            for (let i = 0; i < creditosArray.length; i++) {
+                const numCredito = creditosArray[i];
+                await procesarCredito(numCredito);
+                
+                // Actualizar progreso cada 5 créditos
+                if ((i + 1) % 5 === 0) {
+                    loadingDiv.textContent = `⏳ Procesando datos... ${i + 1}/${creditosArray.length}`;
+                }
+            }
+
+            // Renderizar con datos del mes actual
+            actualizarVista();
+
+            // Actualizar porcentaje de logro inicial
+            calcularTotalesAnio();
+
+            // Mostrar contenido y ocultar loading
+            loadingDiv.style.display = 'none';
+            document.getElementById('main-content').style.display = 'block';
+            
+            console.log('✅ Carga completada');
+            console.log('Datos cargados para todos los meses');
+        } catch (e) {
+            console.error('Error fatal:', e);
+            document.getElementById('loading').innerHTML = '❌ Error al cargar datos. Revisa la consola del navegador (F12) para más detalles.';
+        }
+    }
+
+    // Iniciar
+    cargarDatos();
+</script>
+
+</body>
+</html>
