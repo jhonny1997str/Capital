@@ -53,7 +53,9 @@ const detallesCreditos = {
   "C-025": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSf96zYeovfpkWvvFlJq5HmSmK8jOKD_mRk1O1OzH55JYPWvxhA_8A059juUMTTugsBm__Neax2y1Fn/pub?gid=0&single=true&output=csv",
   "C-026": "https://docs.google.com/spreadsheets/d/e/2PACX-1vSbNleP9kcxYIpPh_kWOtwers9hvhe41K6oLWTcMlPq7CPRUCtrmi7uCsLc-RoGV5NHbneKBXTeXZzX/pub?gid=0&single=true&output=csv",
   "C-027": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTlsi-qkCptV2BLi_5vAyc4PLCttgdHq5l72C-Q3A-LozswXF-Bq9YApXGEzjJdwzVCh_cUSSixmk-H/pub?gid=0&single=true&output=csv",
-  "C-028": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTTwHH7pdftENir4NUbKelMc6kEuo4o3l5oZiV1pB7kDFhzUXuu4q6HnQOVLc_MGGJi6ZQ33s7mO-D/pub?gid=0&single=true&output=csv"
+  "C-028": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTTTwHH7pdftENir4NUbKelMc6kEuo4o3l5oZiV1pB7kDFhzUXuu4q6HnQOVLc_MGGJi6ZQ33s7mO-D/pub?gid=0&single=true&output=csv",
+  "C-029": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwa1c10D_r8DW4VkXvgkvvTywQynHyXJkv7NNxDHC5PpovDW_75_CWos2acjQntcxM7_JlQNfB8_q9/pub?gid=0&single=true&output=csv",
+  "C-030": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTgi2hcn2L1_n7BDCtF2Fh54spvKARBolJh-Ih7DXBmjCRdah-T3i1tDKlaeWUYONcnaXa9sLiABkMR/pub?gid=0&single=true&output=csv"
 };
 
 // ===============================
@@ -184,25 +186,45 @@ function cargarTabla() {
       const tbody = document.querySelector("#tabla-creditos tbody");
       tbody.innerHTML = "";
 
+      // Crear un mapa de datos por crédito desde el CSV
+      const dataMap = {};
       for (const row of results.data) {
-        if (!row["Num de Credito"]) continue;
+        if (row["Num de Credito"]) {
+          dataMap[row["Num de Credito"]] = row;
+        }
+      }
+
+      // Iterar sobre TODOS los créditos del objeto detallesCreditos (incluyendo los nuevos)
+      for (const numCredito of Object.keys(detallesCreditos)) {
+        const row = dataMap[numCredito];
+        
+        // Si no está en el CSV principal, crear una fila con datos mínimos
+        let rowData = row || {
+          "Num de Credito": numCredito,
+          "Marca temporal": "---",
+          "Fecha de Credito ": "---",
+          "Nombre del Cliente": "Cargando...",
+          "Monto prestado": "---",
+          "Modalidad de Pago ": "---",
+          "Estado": "---"
+        };
 
         const tr = document.createElement("tr");
-        const claseEstado = row["Estado"] === "Activo" ? "estado-activo" : "estado-cancelado";
-        const tieneAlertaIcono = await creditoTieneAlerta(row["Num de Credito"]);
+        const claseEstado = rowData["Estado"] === "Activo" ? "estado-activo" : rowData["Estado"] === "Cancelado" ? "estado-cancelado" : "estado-desconocido";
+        const tieneAlertaIcono = await creditoTieneAlerta(numCredito);
 
         tr.innerHTML = `
-          <td>${row["Num de Credito"]}</td>
-          <td>${row["Marca temporal"]}</td>
-          <td>${row["Fecha de Credito "]}</td>
-          <td>${row["Nombre del Cliente"]}</td>
-          <td>$${row["Monto prestado"]}</td>
-          <td>${row["Modalidad de Pago "]}</td>
-          <td class="${claseEstado}">${row["Estado"]}</td>
+          <td>${rowData["Num de Credito"]}</td>
+          <td>${rowData["Marca temporal"]}</td>
+          <td>${rowData["Fecha de Credito "]}</td>
+          <td>${rowData["Nombre del Cliente"]}</td>
+          <td>$${rowData["Monto prestado"]}</td>
+          <td>${rowData["Modalidad de Pago "]}</td>
+          <td class="${claseEstado}">${rowData["Estado"]}</td>
           <td style="font-size:20px">${tieneAlertaIcono ? "⚠️" : ""}</td>
         `;
 
-        tr.ondblclick = () => abrirDetalle(row["Num de Credito"]);
+        tr.ondblclick = () => abrirDetalle(numCredito);
         tbody.appendChild(tr);
       }
     }
