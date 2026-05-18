@@ -169,6 +169,31 @@
             </div>
         </div>
 
+        <!-- 📸 FOTO ACTUAL DEL MES (SOLO PENDIENTES) -->
+        <div style="background: linear-gradient(135deg, #3498db, #2980b9); color: white; padding: 30px; border-radius: 12px; margin-bottom: 30px; box-shadow: 0 6px 12px rgba(0,0,0,0.15);">
+            <div style="font-size: 22px; font-weight: bold; margin-bottom: 25px; text-align: center;">📸 Foto Actual del Mes - Solo Créditos Activos</div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; max-width: 800px; margin: 0 auto;">
+                <!-- CAPITAL ACTIVO EN LA CALLE -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 8px; border-left: 4px solid #2ecc71;">
+                    <div style="font-size: 13px; text-transform: uppercase; opacity: 0.9; margin-bottom: 10px; letter-spacing: 1px;">💵 Capital Activo en la Calle</div>
+                    <div style="font-size: 32px; font-weight: 900; font-family: 'Courier New', monospace;" id="capital-activo-mes">$0,00</div>
+                    <div style="font-size: 11px; opacity: 0.7; margin-top: 8px;">Solo cuotas pendientes</div>
+                </div>
+                <!-- INTERESES POR COBRAR -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 8px; border-left: 4px solid #f39c12;">
+                    <div style="font-size: 13px; text-transform: uppercase; opacity: 0.9; margin-bottom: 10px; letter-spacing: 1px;">📊 Intereses por Cobrar</div>
+                    <div style="font-size: 32px; font-weight: 900; font-family: 'Courier New', monospace;" id="interes-activo-mes">$0,00</div>
+                    <div style="font-size: 11px; opacity: 0.7; margin-top: 8px;">Solo cuotas pendientes</div>
+                </div>
+                <!-- LIQUIDEZ REAL (CAPITAL + INTERÉS) -->
+                <div style="text-align: center; padding: 20px; background: rgba(255,255,255,0.15); border-radius: 8px; border-left: 4px solid #e74c3c; grid-column: 1 / -1;">
+                    <div style="font-size: 13px; text-transform: uppercase; opacity: 0.9; margin-bottom: 10px; letter-spacing: 1px;">⚡ Liquidez Real (Total Activo)</div>
+                    <div style="font-size: 36px; font-weight: 900; font-family: 'Courier New', monospace;" id="liquidez-real-mes">$0,00</div>
+                    <div style="font-size: 11px; opacity: 0.7; margin-top: 8px;">Capital + Intereses sin cobrar este mes</div>
+                </div>
+            </div>
+        </div>
+
         <!-- CUOTAS PAGADAS -->
         <div class="card">
             <div class="seccion-titulo">✅ Cuotas Pagadas</div>
@@ -254,7 +279,9 @@
         "C-037": "https://docs.google.com/spreadsheets/d/e/2PACX-1vQFihGuY6ATIBWXnL4CMCb4k1UcnRpTe2DRT3mgzuVgJ02mop2FxSoZ0DG2wofWBLAqNlK_0sc3xFyY/pub?gid=0&single=true&output=csv",
         "C-038": "https://docs.google.com/spreadsheets/d/e/2PACX-1vScMOKo3VzUw-sMadQ9His2G3ZpWWVwMPMy2xkua1ZJrzXcwqVmXZ0ra1hBw7CSiDlHgx2Qx8V128Xw/pub?gid=0&single=true&output=csv",
         "C-039": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRWdDyVYND4UfQ0rtqx93Y3IYnhA4lvEzC5IZOH-l1Y-KiQEwwrhATg1LeE-dsp5op9lFCsWHpb_lOY/pub?gid=0&single=true&output=csv",
-        "C-040": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd5PnvuBTnQ4X--6oKX1jhoOAQgTkjLVdZ4RzkZCY0-G07NwOtJNrz4kU635GrYVwbzEVszFYAIUsD/pub?gid=0&single=true&output=csv"
+        "C-040": "https://docs.google.com/spreadsheets/d/e/2PACX-1vTd5PnvuBTnQ4X--6oKX1jhoOAQgTkjLVdZ4RzkZCY0-G07NwOtJNrz4kU635GrYVwbzEVszFYAIUsD/pub?gid=0&single=true&output=csv",
+        "C-041": "https://docs.google.com/spreadsheets/d/e/2PACX-1vT0r-5-NDyQV5xvL136KpscpG-e3_f5qV8IVzBjuUdQobQ4Mnn76LHRmYL37_piag11Rr-UgqGSHoDd/pub?gid=0&single=true&output=csv",
+        "C-042": "https://docs.google.com/spreadsheets/d/e/2PACX-1vRbCFJWw1q_aHEw19CK8PWhs_4Rb62mP6zEPvLtx7AuM47XqtJLDnd6xNpYi5MyHAUGOOplGmHuOo7F/pub?gid=0&single=true&output=csv"
 
 
     };
@@ -487,6 +514,17 @@
         document.getElementById('interes-pagado').textContent = `$${interesPagado.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('interes-pendiente').textContent = `$${interesPendiente.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
         document.getElementById('interes-total').textContent = `$${interesTotal.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+
+        // ========== NUEVA FUNCIÓN: 📸 FOTO ACTUAL DEL MES ==========
+        // Solo cuotas PENDIENTES (capital activo en la calle)
+        const capitalActivoMes = cuotasPendientes.reduce((sum, c) => sum + c.capital, 0);
+        const interesActivoMes = cuotasPendientes.reduce((sum, c) => sum + c.interes, 0);
+        const liquidezRealMes = capitalActivoMes + interesActivoMes;
+
+        // Actualizar DOM con la "Foto Actual del Mes"
+        document.getElementById('capital-activo-mes').textContent = `$${capitalActivoMes.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('interes-activo-mes').textContent = `$${interesActivoMes.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
+        document.getElementById('liquidez-real-mes').textContent = `$${liquidezRealMes.toLocaleString('es-ES', {minimumFractionDigits: 2, maximumFractionDigits: 2})}`;
     }
 
     // Cambiar mes y actualizar vista
